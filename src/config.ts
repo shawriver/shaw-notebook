@@ -75,7 +75,7 @@ export const profileConfig: ProfileConfig = {
 		{
 			name: "GitHub",
 			icon: "fa6-brands:github", // Visit https://icones.js.org/ for icon codes
-			url: "https://github.com",
+			url: "https://github.com/shawriver/shaw-notebook",
 		},
 	],
 };
