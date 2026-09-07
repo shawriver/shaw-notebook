@@ -16,15 +16,14 @@ pnpm build        # 生产构建（会顺带生成搜索索引）
 
 线上站点由 VPS 上的 Caddy 提供服务，GitHub 只作为公开源码仓库和备份，不参与页面托管。
 
-服务器上的发布流程由 `/usr/local/bin/knowledge-publish` 完成：
+服务器上的发布流程由 `/usr/local/bin/knowledge-publish` 完成。GitHub 仓库是公开源码备份；当前 VPS 使用独立的发布工作树，先把审核后的源码同步到 `/srv/knowledge/repo`，再执行：
 
 ```bash
 cd /srv/knowledge/repo
-git pull --ff-only
 knowledge-publish
 ```
 
-上述命令用途：拉取已审核的源码并重新构建静态站点，然后原子替换线上文件。风险：会修改服务器上的站点文件并重新加载发布内容，不会修改防火墙或 DNS。
+上述命令用途：重新构建静态站点并原子替换线上文件。风险：会修改服务器上的站点文件并重新加载发布内容，不会修改防火墙或 DNS。
 
 如果需要在本地预览，使用：
 
