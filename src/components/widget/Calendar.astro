@@ -1,0 +1,37 @@
+---
+import WidgetLayout from "./WidgetLayout.astro";
+
+const today = new Date();
+const year = today.getFullYear();
+const monthName = new Intl.DateTimeFormat("zh-CN", { month: "long" }).format(today);
+const todayDate = today.getDate();
+const firstDay = new Date(year, today.getMonth(), 1).getDay();
+const daysInMonth = new Date(year, today.getMonth() + 1, 0).getDate();
+const cells = Array.from({ length: firstDay + daysInMonth }, (_, index) =>
+	index < firstDay ? null : index - firstDay + 1,
+);
+const weekDays = ["日", "一", "二", "三", "四", "五", "六"];
+---
+
+<WidgetLayout name="日历" id="calendar" class="calendar-widget">
+	<div class="flex items-center justify-between mb-3 px-1">
+		<span class="text-sm text-50">{year}</span>
+		<span class="font-bold text-90">{monthName}</span>
+	</div>
+	<div class="grid grid-cols-7 gap-1 text-center text-xs text-50 mb-2">
+		{weekDays.map((day) => <span>{day}</span>)}
+	</div>
+	<div class="grid grid-cols-7 gap-1 text-center text-sm">
+		{cells.map((day) => day === null ? <span class="h-8"></span> :
+			<span class:list={["h-8 flex items-center justify-center rounded-lg", { "calendar-today": day === todayDate }]}>{day}</span>
+		)}
+	</div>
+</WidgetLayout>
+
+<style>
+	.calendar-today {
+		color: var(--primary);
+		box-shadow: inset 0 0 0 1.5px var(--primary);
+		font-weight: 700;
+	}
+</style>

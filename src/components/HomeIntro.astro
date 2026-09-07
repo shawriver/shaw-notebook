@@ -1,0 +1,71 @@
+---
+import { getSortedPostsList, getTutorialBooks } from "@utils/content-utils";
+import { url } from "@utils/url-utils";
+import { Icon } from "astro-icon/components";
+import { profileConfig, siteConfig } from "../config";
+
+const books = await getTutorialBooks();
+const allPosts = await getSortedPostsList();
+const journalCount = allPosts.filter((post) => !post.data.book?.trim()).length;
+const chapterCount = books.reduce((sum, book) => sum + book.chapters.length, 0);
+
+// Show the newest chapter of each volume so the card hints at real content
+// instead of only counting it.
+const bookCards = books.map((book, index) => ({
+	name: book.name,
+	count: book.chapters.length,
+	lastChapter: book.chapters[book.chapters.length - 1],
+	href: `${url("/tutorial/")}#book-${index + 1}`,
+}));
+---
+
+<section class="card-base px-6 py-7 md:px-9 md:py-8 mb-4 onload-animation">
+	<p class="text-sm font-bold text-[var(--primary)] mb-2">{profileConfig.name.toUpperCase()}</p>
+	<h1 class="text-2xl md:text-3xl font-bold text-90 mb-2">{siteConfig.title}</h1>
+	<p class="text-75 max-w-2xl">{profileConfig.bio}</p>
+
+	<div class="flex flex-wrap gap-x-6 gap-y-2 mt-5 text-sm text-50">
+		<span class="flex items-center gap-1.5">
+			<Icon name="material-symbols:menu-book-rounded" class="text-base" />
+			{books.length} 个分册 · {chapterCount} 节
+		</span>
+		<span class="flex items-center gap-1.5">
+			<Icon name="material-symbols:edit-note-rounded" class="text-base" />
+			{journalCount} 篇随手记
+		</span>
+	</div>
+</section>
+
+{bookCards.length > 0 && (
+	<section class="mb-4">
+		<div class="flex items-baseline justify-between px-1 mb-2">
+			<h2 class="font-bold text-lg text-90">教程分册</h2>
+			<a href={url("/tutorial/")} class="text-sm text-50 hover:text-[var(--primary)] transition">
+				全部 →
+			</a>
+		</div>
+
+		<div class="grid sm:grid-cols-2 gap-3">
+			{bookCards.map((book) => (
+				<a
+					href={book.href}
+					class="card-base group p-5 flex flex-col gap-1 active:scale-[0.98] onload-animation"
+				>
+					<div class="flex items-center justify-between gap-2">
+						<span class="font-bold text-90 group-hover:text-[var(--primary)] transition truncate">
+							{book.name}
+						</span>
+						<span class="text-sm text-50 shrink-0">{book.count} 节</span>
+					</div>
+					{book.lastChapter && (
+						<span class="text-sm text-50 truncate">末节：{book.lastChapter.title}</span>
+					)}
+				</a>
+			))}
+		</div>
+	</section>
+)}
+
+{journalCount > 0 && (
+	<h2 class="font-bold text-lg text-90 px-1 mb-2">最近记录</h2>
+)}

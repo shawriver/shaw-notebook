@@ -1,0 +1,15 @@
+---
+import Calendar from "./Calendar.astro";
+import Tags from "./Tags.astro";
+
+interface Props {
+	class?: string;
+}
+
+const className = Astro.props.class;
+---
+
+<aside class:list={[className, "flex flex-col gap-4"]}>
+	<Calendar class="onload-animation" style="animation-delay: 100ms" />
+	<Tags class="onload-animation" style="animation-delay: 150ms" />
+</aside>

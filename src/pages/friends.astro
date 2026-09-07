@@ -1,0 +1,44 @@
+---
+import { Icon } from "astro-icon/components";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { friendLinks } from "../config";
+---
+
+<MainGridLayout title="友链" description="朋友们的网站和常看的个人博客">
+	<div class="card-base px-6 py-7 md:px-9 md:py-8 mb-4">
+		<div class="flex items-center gap-3 mb-3">
+			<div class="h-10 w-10 rounded-lg bg-[var(--btn-regular-bg)] text-[var(--primary)] flex items-center justify-center">
+				<Icon name="material-symbols:link-rounded" class="text-2xl" />
+			</div>
+			<div>
+				<h1 class="text-3xl font-bold text-90">友链</h1>
+				<p class="text-50 text-sm mt-1">朋友们的网站，以及我经常拜访的个人博客。</p>
+			</div>
+		</div>
+	</div>
+
+	<div class="grid sm:grid-cols-2 gap-4">
+		{friendLinks.map((friend) => (
+			<a
+				href={friend.url}
+				target="_blank"
+				rel="noopener noreferrer"
+				class="card-base group p-5 flex items-center gap-4 active:scale-[0.98]"
+			>
+				<img src={friend.avatar} alt={`${friend.name} 的头像`} class="h-14 w-14 rounded-lg object-cover bg-white/60" />
+				<div class="min-w-0 flex-1">
+					<div class="flex items-center gap-2 font-bold text-lg text-90 group-hover:text-[var(--primary)]">
+						{friend.name}
+						<Icon name="fa6-solid:arrow-up-right-from-square" class="text-xs text-30" />
+					</div>
+					<p class="text-50 text-sm mt-1 line-clamp-2">{friend.description}</p>
+				</div>
+			</a>
+		))}
+	</div>
+
+	<div class="card-base p-6 mt-4">
+		<h2 class="font-bold text-lg text-90 mb-2">添加友链</h2>
+		<p class="text-50 text-sm">以后只需修改 <code>src/config.ts</code> 里的 <code>friendLinks</code>，页面会自动生成新的友链卡片。</p>
+	</div>
+</MainGridLayout>

@@ -1,0 +1,66 @@
+---
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { getTutorialBooks } from "@utils/content-utils";
+import { getPostUrlBySlug } from "@utils/url-utils";
+
+const books = await getTutorialBooks();
+const totalChapters = books.reduce(
+	(sum, book) => sum + book.chapters.length,
+	0,
+);
+---
+
+<MainGridLayout title="教程" description="按主题分册整理的学习笔记">
+	<div class="card-base p-6 md:p-9 mb-4">
+		<div class="text-sm text-[var(--primary)] font-bold mb-2">TUTORIAL</div>
+		<h1 class="text-3xl md:text-4xl font-bold text-90 mb-3">我的菜鸟教程</h1>
+		<p class="text-75 max-w-2xl">
+			把学习时真正弄懂的东西按主题分册整理，方便日后回顾。
+			{totalChapters > 0 && <span class="text-50">目前 {books.length} 个分册，共 {totalChapters} 节。</span>}
+		</p>
+	</div>
+
+	{books.length === 0 ? (
+		<div class="card-base p-6">
+			<p class="text-75 mb-3">还没有教程章节。</p>
+			<p class="text-50 text-sm">
+				在文章开头加上 <code class="text-[var(--primary)]">book: FreeRTOS</code>
+				和 <code class="text-[var(--primary)]">order: 1</code>，它就会出现在这里。
+			</p>
+		</div>
+	) : (
+		<div class="flex flex-col gap-4">
+			{books.map((book, index) => (
+				<section id={`book-${index + 1}`} class="card-base p-6 md:p-7 scroll-mt-24">
+					<div class="flex items-baseline justify-between gap-3 mb-4 pb-3 border-b border-[var(--line-divider)]">
+						<h2 class="font-bold text-xl text-90">{book.name}</h2>
+						<span class="text-sm text-50 shrink-0">{book.chapters.length} 节</span>
+					</div>
+
+					<ol class="flex flex-col gap-1">
+						{book.chapters.map((chapter, index) => (
+							<li>
+								<a
+									class="group flex items-baseline gap-3 rounded-md px-3 py-2 -mx-1 transition hover:bg-[var(--btn-plain-bg-hover)]"
+									href={getPostUrlBySlug(chapter.slug)}
+								>
+									<span class="text-sm text-50 tabular-nums shrink-0 w-6 text-right">
+										{index + 1}
+									</span>
+									<span class="flex flex-col gap-0.5 min-w-0">
+										<span class="text-90 group-hover:text-[var(--primary)] transition">
+											{chapter.title}
+										</span>
+										{chapter.description && (
+											<span class="text-sm text-50 line-clamp-1">{chapter.description}</span>
+										)}
+									</span>
+								</a>
+							</li>
+						))}
+					</ol>
+				</section>
+			))}
+		</div>
+	)}
+</MainGridLayout>
