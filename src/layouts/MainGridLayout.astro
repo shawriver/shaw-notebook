@@ -6,15 +6,15 @@ import SideBar from "@components/widget/SideBar.astro";
 import type { MarkdownHeading } from "astro";
 import { Icon } from "astro-icon/components";
 import ImageWrapper from "../components/misc/ImageWrapper.astro";
-import TOC from "../components/widget/TOC.astro";
 import RightSidebar from "../components/widget/RightSidebar.astro";
+import TOC from "../components/widget/TOC.astro";
 import { siteConfig } from "../config";
-import { pathsEqual, url } from "../utils/url-utils";
 import {
 	BANNER_HEIGHT,
 	BANNER_HEIGHT_EXTEND,
 	MAIN_PANEL_OVERLAPS_BANNER_HEIGHT,
 } from "../constants/constants";
+import { pathsEqual, url } from "../utils/url-utils";
 import Layout from "./Layout.astro";
 
 interface Props {
@@ -54,12 +54,24 @@ const mainPanelTop = siteConfig.banner.enable
 </div>
 
 <!-- Banner -->
-{siteConfig.banner.enable && <div id="banner-wrapper" class={`absolute z-10 w-full transition duration-700 overflow-hidden`} style={`top: -${BANNER_HEIGHT_EXTEND}vh`}>
-    <ImageWrapper id="banner" alt="Banner image of the blog" class:list={["object-cover h-full transition duration-700 opacity-0 scale-105"]}
-                  src={siteConfig.banner.src} position={siteConfig.banner.position}
-    >
-    </ImageWrapper>
-</div>}
+{siteConfig.banner.enable && (
+    <div id="banner-wrapper" class={`absolute z-10 w-full transition duration-700 overflow-hidden`} style={`top: -${BANNER_HEIGHT_EXTEND}vh`}>
+        <ImageWrapper
+            id="banner-light"
+            alt="Banner image of the blog"
+            class:list={["banner-image absolute inset-0 object-cover h-full transition duration-700 opacity-0 scale-105", "dark:hidden"]}
+            src={siteConfig.banner.src}
+            position={siteConfig.banner.position}
+        />
+        <ImageWrapper
+            id="banner-dark"
+            alt="Banner image of the blog"
+            class:list={["banner-image absolute inset-0 object-cover h-full transition duration-700 opacity-0 scale-105", "hidden dark:block"]}
+            src={siteConfig.banner.darkSrc || siteConfig.banner.src}
+            position={siteConfig.banner.position}
+        />
+    </div>
+)}
 
 <!-- Main content -->
 <div class="absolute w-full z-30 pointer-events-none" style={`top: ${mainPanelTop}`}>

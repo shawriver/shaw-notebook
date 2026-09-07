@@ -8,17 +8,18 @@ import type {
 import { LinkPreset } from "./types/config";
 
 export const siteConfig: SiteConfig = {
-	title: "Shaw 的树洞",
-	brand: "Shaw's Notebook",
-	subtitle: "学习笔记 / 折腾记录 / 随手写",
+	title: "Shaw 的小屋",
+	brand: "Shaw",
+	subtitle: "随手记，随手看",
 	lang: "zh_CN", // Language code, e.g. 'en', 'zh_CN', 'ja', etc.
 	themeColor: {
 		hue: 165, // Default hue for the theme color, from 0 to 360. e.g. red: 0, teal: 200, cyan: 250, pink: 345
 		fixed: false, // Hide the theme color picker for visitors
 	},
 	banner: {
-		enable: false,
-		src: "assets/images/demo-banner.png", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
+		enable: true,
+		src: "assets/images/penguin-light.jpg", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
+		darkSrc: "assets/images/penguin-dark.jpg",
 		position: "center", // Equivalent to object-position, only supports 'top', 'center', 'bottom'. 'center' by default
 		credit: {
 			enable: false, // Display the credit text of the banner image
@@ -68,9 +69,9 @@ export const friendLinks = [
 ];
 
 export const profileConfig: ProfileConfig = {
-	avatar: "assets/images/demo-avatar.png", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
+	avatar: "assets/images/xiaoyan.png", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
 	name: "Shaw",
-	bio: "在树洞里记点东西：嵌入式、数据结构，还有折腾服务器的过程。",
+	bio: "这里没有什么固定主题，只是随手记下路上遇见的东西。有时是折腾留下的痕迹，有时是学习里突然想明白的一点，也有些无关紧要的日常和偶尔冒出来的念头。不用刻意归类，也不用事事都有答案，只想把值得留下的片段，安静地放在这里。",
 	links: [
 		{
 			name: "GitHub",
