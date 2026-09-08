@@ -24,7 +24,10 @@ const weekDays = ["日", "一", "二", "三", "四", "五", "六"];
 <WidgetLayout name="日历" id="calendar" class="calendar-widget">
 	<div class="flex items-center justify-between mb-3 px-1 calendar-heading">
 		<span class="text-sm text-50 calendar-year">{year}</span>
-		<span class="font-bold text-90 calendar-month">{monthName}</span>
+		<div class="flex items-baseline gap-2">
+			<span class="font-bold text-90 calendar-month">{monthName}</span>
+			<span class="text-xs text-50 calendar-current">今天 {todayDate} 日</span>
+		</div>
 	</div>
 	<div class="grid grid-cols-7 gap-1 text-center text-xs text-50 mb-2">
 		{weekDays.map((day) => <span>{day}</span>)}
@@ -60,10 +63,12 @@ const weekDays = ["日", "一", "二", "三", "四", "五", "六"];
 			.format(new Date(Date.UTC(date.year, date.month, 1)));
 		const yearElement = calendar.querySelector(".calendar-year");
 		const monthElement = calendar.querySelector(".calendar-month");
+		const currentElement = calendar.querySelector(".calendar-current");
 		const daysElement = calendar.querySelector(".calendar-days");
-		if (!yearElement || !monthElement || !daysElement) return;
+		if (!yearElement || !monthElement || !currentElement || !daysElement) return;
 		yearElement.textContent = String(date.year);
 		monthElement.textContent = monthName;
+		currentElement.textContent = `今天 ${date.day} 日`;
 		daysElement.replaceChildren();
 		for (let index = 0; index < firstDay + daysInMonth; index += 1) {
 			const cell = document.createElement("span");
@@ -88,5 +93,13 @@ const weekDays = ["日", "一", "二", "三", "四", "五", "六"];
 		color: var(--primary);
 		box-shadow: inset 0 0 0 1.5px var(--primary);
 		font-weight: 700;
+	}
+
+	.calendar-days {
+		color: var(--deep-text);
+	}
+
+	:global(.dark) .calendar-days {
+		color: rgba(255, 255, 255, 0.88);
 	}
 </style>

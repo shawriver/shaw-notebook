@@ -60,18 +60,12 @@ export const navBarConfig: NavBarConfig = {
 };
 
 export const friendLinks = [
-	{
-		name: "Firefly",
-		description: "Fuwari 主题的个人技术博客，也是本站的视觉灵感来源。",
-		url: "https://www.pidexe.com/",
-		avatar: "https://www.pidexe.com/assets/images/favicon.ico",
-	},
 ];
 
 export const profileConfig: ProfileConfig = {
 	avatar: "assets/images/xiaoyan.png", // Relative to the /src directory. Relative to the /public directory if it starts with '/'
-	name: "Shaw",
-	bio: "这里没有什么固定主题，只是随手记下路上遇见的东西。有时是折腾留下的痕迹，有时是学习里突然想明白的一点，也有些无关紧要的日常和偶尔冒出来的念头。不用刻意归类，也不用事事都有答案，只想把值得留下的片段，安静地放在这里。",
+	name: "Shaw 的小屋",
+	bio: "记录我的成长",
 	links: [
 		{
 			name: "GitHub",
