@@ -6,7 +6,7 @@ import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 import { getSortedPosts } from "@utils/content-utils";
-import { getDir, getPostUrlBySlug } from "@utils/url-utils";
+import { getDir, getPostUrlBySlug, url } from "@utils/url-utils";
 import { Icon } from "astro-icon/components";
 import { licenseConfig } from "src/config";
 import ImageWrapper from "../../components/misc/ImageWrapper.astro";
@@ -24,6 +24,7 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content, headings } = await entry.render();
+const backUrl = entry.data.book?.trim() ? url("/tutorial/") : url("/");
 
 const { remarkPluginFrontmatter } = await entry.render();
 
@@ -51,6 +52,14 @@ const jsonLd = {
         <div id="post-container" class:list={["card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full ",
             {}
         ]}>
+            <a
+                href={backUrl}
+                aria-label="返回上一级"
+                class="btn-plain scale-animation rounded-lg h-10 w-fit px-3 text-sm font-bold mb-3 active:scale-95"
+            >
+                <Icon name="material-symbols:arrow-back-rounded" class="text-[1.25rem] mr-1" />
+                返回上一级
+            </a>
             <!-- word count and reading time -->
             <div class="flex flex-row text-black/30 dark:text-white/30 gap-5 mb-3 transition onload-animation">
                 <div class="flex flex-row items-center">
