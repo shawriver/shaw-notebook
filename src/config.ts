@@ -60,6 +60,18 @@ export const navBarConfig: NavBarConfig = {
 };
 
 export const friendLinks = [
+	{
+		name: "CMLiussss",
+		url: "https://cmliussss.com/",
+		avatar: "https://cmliussss.com/favicon.ico",
+		description: "CMLiussss 的博客，记录 VPS、网络和各种折腾。",
+	},
+	{
+		name: "老王博客",
+		url: "https://laowangblog.com/",
+		avatar: "https://laowangblog.com/favicon.ico",
+		description: "老王的互联网生活，分享技术、网络与日常记录。",
+	},
 ];
 
 export const profileConfig: ProfileConfig = {
