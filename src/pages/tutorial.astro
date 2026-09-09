@@ -10,12 +10,12 @@ const totalChapters = books.reduce(
 );
 ---
 
-<MainGridLayout title="教程" description="按主题分册整理的学习笔记">
+<MainGridLayout title="我的菜鸟教程" description="一只小菜鸟的学习历程">
 	<div class="card-base p-6 md:p-9 mb-4">
 		<div class="text-sm text-[var(--primary)] font-bold mb-2">TUTORIAL</div>
-		<h1 class="text-3xl md:text-4xl font-bold text-90 mb-3">一只小菜鸟的学习历程</h1>
+		<h1 class="text-3xl md:text-4xl font-bold text-90 mb-3">我的菜鸟教程</h1>
 		<p class="text-75 max-w-2xl">
-			把学习时真正弄懂的东西按主题分册整理，方便日后回顾。
+			一只小菜鸟的学习历程
 			{totalChapters > 0 && <span class="text-50">目前 {books.length} 个分册，共 {totalChapters} 节。</span>}
 		</p>
 	</div>

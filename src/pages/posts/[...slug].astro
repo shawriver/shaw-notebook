@@ -25,6 +25,7 @@ export async function getStaticPaths() {
 const { entry } = Astro.props;
 const { Content, headings } = await entry.render();
 const backUrl = entry.data.book?.trim() ? url("/tutorial/") : url("/");
+const editorPath = entry.id.replace(/^content\/posts\//, "");
 
 const { remarkPluginFrontmatter } = await entry.render();
 
@@ -52,14 +53,26 @@ const jsonLd = {
         <div id="post-container" class:list={["card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full ",
             {}
         ]}>
-            <a
-                href={backUrl}
-                aria-label="返回上一级"
-                class="btn-plain scale-animation rounded-lg h-10 w-fit px-3 text-sm font-bold mb-3 active:scale-95"
-            >
-                <Icon name="material-symbols:arrow-back-rounded" class="text-[1.25rem] mr-1" />
-                返回上一级
-            </a>
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <a
+                    href={backUrl}
+                    aria-label="返回上一级"
+                    class="btn-plain scale-animation rounded-lg h-10 w-fit px-3 text-sm font-bold active:scale-95"
+                >
+                    <Icon name="material-symbols:arrow-back-rounded" class="text-[1.25rem] mr-1" />
+                    返回上一级
+                </a>
+                <button
+                    type="button"
+                    id="inline-edit-button"
+                    data-editor-path={editorPath}
+                    aria-label="编辑本文"
+                    class="btn-plain scale-animation rounded-lg h-10 w-fit px-3 text-sm font-bold active:scale-95"
+                >
+                    <Icon name="material-symbols:edit-rounded" class="text-[1.15rem] mr-1" />
+                    编辑本文
+                </button>
+            </div>
             <!-- word count and reading time -->
             <div class="flex flex-row text-black/30 dark:text-white/30 gap-5 mb-3 transition onload-animation">
                 <div class="flex flex-row items-center">
@@ -111,9 +124,193 @@ const jsonLd = {
             }
 
 
-            <Markdown class="mb-6 markdown-content onload-animation">
-                <Content />
-            </Markdown>
+            <div id="post-rendered-content">
+                <Markdown class="mb-6 markdown-content onload-animation">
+                    <Content />
+                </Markdown>
+            </div>
+
+            <div id="post-inline-editor" hidden class="mb-6 pt-20">
+                <div class="fixed top-[4.75rem] left-1/2 z-40 w-[min(96vw,48rem)] -translate-x-1/2 flex flex-wrap items-center justify-center gap-1 mb-2 rounded-lg border border-black/10 dark:border-white/15 bg-[var(--card-bg)]/95 p-2 shadow-sm backdrop-blur" role="toolbar" aria-label="文本格式">
+                    <button type="button" data-rich-command="undo" class="btn-plain rounded-lg h-9 px-3 text-sm">撤销</button>
+                    <button type="button" data-rich-command="redo" class="btn-plain rounded-lg h-9 px-3 text-sm">重做</button>
+                    <button type="button" data-rich-command="bold" class="btn-plain rounded-lg h-9 px-3 text-sm font-bold">加粗</button>
+                    <button type="button" data-rich-command="italic" class="btn-plain rounded-lg h-9 px-3 text-sm italic">斜体</button>
+                    <button type="button" data-rich-command="formatBlock" data-rich-value="h2" class="btn-plain rounded-lg h-9 px-3 text-sm font-bold">H2</button>
+                    <button type="button" data-rich-command="formatBlock" data-rich-value="h3" class="btn-plain rounded-lg h-9 px-3 text-sm font-bold">H3</button>
+                    <button type="button" data-rich-command="insertUnorderedList" class="btn-plain rounded-lg h-9 px-3 text-sm">列表</button>
+                    <button type="button" data-rich-command="insertOrderedList" class="btn-plain rounded-lg h-9 px-3 text-sm">编号</button>
+                    <button type="button" data-rich-command="formatBlock" data-rich-value="blockquote" class="btn-plain rounded-lg h-9 px-3 text-sm">引用</button>
+                    <button type="button" data-rich-command="formatBlock" data-rich-value="pre" class="btn-plain rounded-lg h-9 px-3 text-sm font-mono">代码</button>
+                    <button type="button" data-rich-command="createLink" class="btn-plain rounded-lg h-9 px-3 text-sm">链接</button>
+                    <button type="button" data-rich-command="insertHorizontalRule" class="btn-plain rounded-lg h-9 px-3 text-sm">分隔线</button>
+                    <button type="button" data-rich-command="removeFormat" class="btn-plain rounded-lg h-9 px-3 text-sm">清除格式</button>
+                </div>
+                <div id="post-rich-editor" contenteditable="true" role="textbox" aria-multiline="true" class="w-full min-h-[32rem] rounded-lg border border-black/10 dark:border-white/15 bg-white/70 dark:bg-black/20 p-4 text-sm leading-7 outline-none" spellcheck="true"></div>
+                <div class="flex flex-wrap items-center gap-2 mt-3">
+                    <button type="button" id="post-edit-cancel" class="btn-plain rounded-lg h-10 px-3 text-sm font-bold">取消</button>
+                    <button type="button" id="post-edit-save" class="btn-plain rounded-lg h-10 px-3 text-sm font-bold">保存并发布</button>
+                    <span id="post-edit-status" class="text-sm text-black/50 dark:text-white/50"></span>
+                </div>
+            </div>
+
+            <div id="post-edit-login" hidden class="mb-6 rounded-lg border border-black/10 dark:border-white/15 bg-white/70 dark:bg-black/20 p-4">
+                <p class="text-sm mb-3">请输入编辑凭据，只有站点所有者可以修改文章。</p>
+                <form id="post-edit-login-form" class="flex flex-wrap items-end gap-3">
+                    <label class="text-sm">用户名<input id="post-edit-user" class="block mt-1 rounded-lg border border-black/10 dark:border-white/15 bg-transparent px-3 py-2" autocomplete="username" required></label>
+                    <label class="text-sm">密码<input id="post-edit-password" type="password" class="block mt-1 rounded-lg border border-black/10 dark:border-white/15 bg-transparent px-3 py-2" autocomplete="current-password" required></label>
+                    <button type="submit" class="btn-plain rounded-lg h-10 px-3 text-sm font-bold">验证并编辑</button>
+                </form>
+            </div>
+
+            <script is:inline>
+                (() => {
+                    const editButton = document.getElementById("inline-edit-button");
+                    const rendered = document.getElementById("post-rendered-content");
+                    const editor = document.getElementById("post-inline-editor");
+                    const richEditor = document.getElementById("post-rich-editor");
+                    const toolbar = document.querySelector('#post-inline-editor [role="toolbar"]');
+                    const cancel = document.getElementById("post-edit-cancel");
+                    const save = document.getElementById("post-edit-save");
+                    const status = document.getElementById("post-edit-status");
+                    const login = document.getElementById("post-edit-login");
+                    const loginForm = document.getElementById("post-edit-login-form");
+                    const user = document.getElementById("post-edit-user");
+                    const password = document.getElementById("post-edit-password");
+                    const path = editButton?.dataset.editorPath;
+                    let authorization = "";
+                    let frontmatter = "";
+                    let dirty = false;
+
+                    const showToolbar = () => {
+                        if (!toolbar) return;
+                        toolbar.hidden = false;
+                        if (toolbar.parentElement !== document.body) {
+                            document.body.appendChild(toolbar);
+                        }
+                    };
+
+                    const hideToolbar = () => {
+                        if (!toolbar) return;
+                        toolbar.hidden = true;
+                        if (toolbar.parentElement === document.body) {
+                            editor.prepend(toolbar);
+                        }
+                    };
+
+                    if (!editButton || !path) return;
+
+                    const setStatus = (message, error = false) => {
+                        status.textContent = message;
+                        status.classList.toggle("text-red-500", error);
+                    };
+
+                    const askForLogin = () => new Promise((resolve, reject) => {
+                        login.hidden = false;
+                        user.focus();
+                        loginForm.onsubmit = (event) => {
+                            event.preventDefault();
+                            const value = `${user.value}:${password.value}`;
+                            authorization = `Basic ${btoa(value)}`;
+                            login.hidden = true;
+                            resolve();
+                        };
+                        cancel.onclick = () => {
+                            login.hidden = true;
+                            reject(new Error("已取消编辑"));
+                        };
+                    });
+
+                    const request = async (url, options = {}) => {
+                        const headers = new Headers(options.headers || {});
+                        if (authorization) headers.set("Authorization", authorization);
+                        let response = await fetch(url, { ...options, headers });
+                        if (response.status === 401 && !authorization) {
+                            await askForLogin();
+                            response = await request(url, options);
+                        }
+                        return response;
+                    };
+
+                    editButton.addEventListener("click", async () => {
+                        editButton.disabled = true;
+                        setStatus("正在加载 Markdown…");
+                        try {
+                            const response = await request(`/editor/api/post?path=${encodeURIComponent(path)}`);
+                            if (!response.ok) throw new Error(`读取失败（${response.status}）`);
+                            const data = await response.json();
+                            const frontmatterMatch = data.content.match(/^---[\\s\\S]*?\\n---\\s*/);
+                            frontmatter = frontmatterMatch ? frontmatterMatch[0] : "";
+                            richEditor.innerHTML = rendered.innerHTML;
+                            dirty = false;
+                            rendered.hidden = true;
+                            editor.hidden = false;
+                            editButton.hidden = true;
+                            showToolbar();
+                            richEditor.focus();
+                            setStatus("可以编辑");
+                        } catch (error) {
+                            setStatus(error.message || "读取失败", true);
+                        } finally {
+                            editButton.disabled = false;
+                        }
+                    });
+
+                    cancel.addEventListener("click", () => {
+                        if (dirty && !window.confirm("放弃这次修改吗？未保存的内容会丢失。")) return;
+                        editor.hidden = true;
+                        rendered.hidden = false;
+                        editButton.hidden = false;
+                        hideToolbar();
+                        setStatus("");
+                    });
+
+                    window.addEventListener("pagehide", hideToolbar);
+                    if (window.swup?.hooks) {
+                        window.swup.hooks.on("visit:start", hideToolbar);
+                    } else {
+                        document.addEventListener("swup:enable", () => {
+                            window.swup?.hooks.on("visit:start", hideToolbar);
+                        }, { once: true });
+                    }
+
+                    save.addEventListener("click", async () => {
+                        if (!window.confirm("确认保存并发布这篇文章吗？")) return;
+                        save.disabled = true;
+                        setStatus("正在保存并发布…");
+                        try {
+                            const html = richEditor.innerHTML.trim();
+                            if (!html) throw new Error("正文不能为空");
+                            const response = await request("/editor/api/post", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ path, content: `${frontmatter}\\n${html}\\n` }),
+                            });
+                            const data = await response.json();
+                            if (!response.ok) throw new Error(data.error || `发布失败（${response.status}）`);
+                            setStatus("发布成功，正在刷新…");
+                            window.location.reload();
+                        } catch (error) {
+                            setStatus(error.message || "发布失败", true);
+                            save.disabled = false;
+                        }
+                    });
+
+                    document.querySelectorAll("[data-rich-command]").forEach((button) => {
+                        button.addEventListener("mousedown", (event) => event.preventDefault());
+                        button.addEventListener("click", () => {
+                            richEditor.focus();
+                            if (button.dataset.richCommand === "createLink") {
+                                const href = window.prompt("请输入链接地址");
+                                if (href) document.execCommand("createLink", false, href);
+                                return;
+                            }
+                            document.execCommand(button.dataset.richCommand, false, button.dataset.richValue || null);
+                        });
+                    });
+                    richEditor.addEventListener("input", () => { dirty = true; });
+                })();
+            </script>
 
             {licenseConfig.enable && <License title={entry.data.title} slug={entry.slug} pubDate={entry.data.published} class="mb-6 rounded-xl license-container onload-animation"></License>}
 
